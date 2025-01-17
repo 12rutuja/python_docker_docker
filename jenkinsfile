@@ -1,1 +1,31 @@
+pipeline {
+    agent any
 
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git 'https://github.com/12rutuja/python_docker_docker.git",branch:"main'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t rutujakurhekar/hello-world-app .'
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                withDockerRegistry([credentialsId: 'dockerhub-credentials-id', url: '']) {
+                    sh 'docker push rutujakurhekar/hello-world-app'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh 'docker run -d -p 5000:5000 rutujakurhekar/hello-world-app'
+            }
+        }
+    }
+}
